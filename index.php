@@ -100,7 +100,6 @@ while($results = mysqli_fetch_array($query))
 {
 
 ?>
-
                         <div class="col-list-3">
                             <div class="recent-car-list">
                                 <div class="car-info-box"> <a
@@ -131,7 +130,6 @@ while($results = mysqli_fetch_array($query))
                             </div>
                         </div>
                         <?php }}?>
-
                     </div>
                 </div>
             </div>

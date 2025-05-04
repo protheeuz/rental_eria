@@ -102,6 +102,75 @@ $totalmobil = $harga * $durasi;
 $totalsewa = $totalmobil + $drivercharges;
 ?>
 
+<!-- Tambahkan script ini sebelum </body> -->
+<script src="https://app.sandbox.midtrans.com/snap/snap.js"
+	data-client-key="<?= MIDTRANS_CLIENT_KEY ?>"></script>
+
+<script>
+	document.querySelector('form').addEventListener('submit', async function(e) {
+		e.preventDefault();
+
+		// Tampilkan loading state
+		const btn = this.querySelector('button');
+		btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Memproses...';
+		btn.disabled = true;
+
+		try {
+			// Kirim data ke server
+			const formData = new FormData(this);
+			const response = await fetch('process_payment.php', {
+				method: 'POST',
+				body: formData
+			});
+
+			const result = await response.json();
+
+			if (!result.success) {
+				throw new Error(result.message);
+			}
+
+			// Tampilkan popup Midtrans
+			snap.pay(result.snap_token, {
+				onSuccess: async function(res) {
+					await updateStatus(result.kode, 'success');
+					window.location.href = `payment_success.php?kode=${result.kode}`;
+				},
+				onPending: async function(res) {
+					await updateStatus(result.kode, 'pending');
+					window.location.href = `riwayatsewa.php?kode=${result.kode}`;
+				},
+				onError: function(res) {
+					alert('Pembayaran gagal: ' + res.status_message);
+					updateStatus(result.kode, 'failed');
+					window.location.reload();
+				},
+				onClose: function() {
+					if (confirm('Batalkan pembayaran?')) {
+						updateStatus(result.kode, 'canceled');
+						window.location.reload();
+					}
+				}
+			});
+
+		} catch (error) {
+			alert('Error: ' + error.message);
+			window.location.reload();
+		} finally {
+			btn.innerHTML = '<i class="fa fa-credit-card"></i> Bayar Sekarang';
+			btn.disabled = false;
+		}
+	});
+
+	// Fungsi update status
+	async function updateStatus(kode, status) {
+		try {
+			await fetch(`update_status.php?kode=${kode}&status=${status}`);
+		} catch (error) {
+			console.error('Gagal update status:', error);
+		}
+	}
+</script>
+
 <!DOCTYPE HTML>
 <html lang="en">
 

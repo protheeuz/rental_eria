@@ -77,7 +77,6 @@ $sql = "INSERT INTO booking
             ''
         )";
 
-// Di bagian error handling
 if (!mysqli_query($koneksidb, $sql)) {
     error_log("MySQL Error: " . mysqli_error($koneksidb));
     $params = http_build_query([
@@ -93,6 +92,24 @@ if (!mysqli_query($koneksidb, $sql)) {
         window.location = 'booking_ready.php?$params';
         </script>");
 }
+
+$insert_cek = "INSERT INTO cek_booking 
+    (kode_booking, id_mobil, tgl_mulai, tgl_selesai, status) 
+    VALUES 
+    ('$kode', 
+    " . (int)$_SESSION['booking_data']['vid'] . ", 
+    '" . $_SESSION['booking_data']['fromdate'] . "', 
+    '" . $_SESSION['booking_data']['todate'] . "', 
+    'Menunggu Pembayaran')";
+
+if (!mysqli_query($koneksidb, $insert_cek)) {
+    error_log("Gagal insert cek_booking: " . mysqli_error($koneksidb));
+    die("<script>
+        alert('Gagal memproses ketersediaan mobil!');
+        window.location = 'booking.php';
+        </script>");
+}
+
 // Setup Midtrans
 try {
     // Validasi total

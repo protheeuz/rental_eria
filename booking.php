@@ -20,15 +20,62 @@ if (strlen($_SESSION['ulogin']) == 0) {
 		$vid = $_POST['vid'];
 		$pickup = $_POST['pickup'];
 
-		$sql = "SELECT kode_booking FROM cek_booking 
-        WHERE tgl_booking BETWEEN '$fromdate' AND '$todate' 
-        AND id_mobil = '$vid' 
-        AND (status = 'Sudah Dibayar' OR status = 'success')";
+		// Validasi tanggal
+		if (strtotime($todate) < strtotime($fromdate)) {
+			echo "<script>alert('Tanggal selesai tidak valid!');</script>";
+			exit;
+		}
 
-		$query = mysqli_query($koneksidb, $sql);
+		if (strtotime($fromdate) < strtotime($now)) {
+			echo "<script>alert('Tanggal mulai tidak boleh sebelum hari ini!');window.history.back();</script>";
+			exit;
+		}
+
+		// Ambil nama mobil
+		$sqlNamaMobil = "SELECT nama_mobil FROM mobil WHERE id_mobil = ?";
+		$stmtNama = mysqli_prepare($koneksidb, $sqlNamaMobil);
+		mysqli_stmt_bind_param($stmtNama, 'i', $vid);
+		mysqli_stmt_execute($stmtNama);
+		$resultNama = mysqli_stmt_get_result($stmtNama);
+		$rowNama = mysqli_fetch_assoc($resultNama);
+		$nama_mobil = htmlspecialchars($rowNama['nama_mobil'] ?? 'Mobil', ENT_QUOTES);
+
+		// Query cek ketersediaan
+		$sql = "SELECT kode_booking FROM booking 
+		WHERE id_mobil = ? 
+		AND (status = 'Sudah Dibayar' OR status = 'success')
+		AND (
+			(? BETWEEN tgl_mulai AND tgl_selesai) OR
+			(? BETWEEN tgl_mulai AND tgl_selesai) OR
+			(tgl_mulai BETWEEN ? AND ?) OR
+			(tgl_selesai BETWEEN ? AND ?) OR
+			(tgl_mulai <= ? AND tgl_selesai >= ?)
+		)";
+
+		$stmt = mysqli_prepare($koneksidb, $sql);
+		mysqli_stmt_bind_param(
+			$stmt,
+			'issssssss',
+			$vid,
+			$fromdate,
+			$todate,
+			$fromdate,
+			$todate,
+			$fromdate,
+			$todate,
+			$fromdate,
+			$todate
+		);
+		mysqli_stmt_execute($stmt);
+		$query = mysqli_stmt_get_result($stmt);
 
 		if (mysqli_num_rows($query) > 0) {
-			echo "<script>alert('Mobil tidak tersedia di tanggal yang dipilih!');</script>";
+			$message = "Mobil $nama_mobil tidak tersedia pada tanggal $fromdate - $todate!";
+			echo "<script>
+					alert(" . json_encode($message) . ");
+					window.history.back();
+				  </script>";
+			exit;
 		} else {
 			$params = http_build_query([
 				'vid' => $vid,
@@ -37,29 +84,10 @@ if (strlen($_SESSION['ulogin']) == 0) {
 				'driver' => $driver,
 				'pickup' => $pickup
 			]);
-
-			echo "<script>
-				document.location = 'booking_ready.php?$params';
-			</script>";
+			header("Location: booking_ready.php?$params");
+			exit;
 		}
 	}
-
-	// if(isset($_POST['submit'])){
-	// 	$fromdate=$_POST['fromdate'];
-	// 	$todate=$_POST['todate'];
-	// 	$driver=$_POST['driver'];
-	// 	$vid=$_POST['vid'];
-	// 	$pickup=$_POST['pickup'];
-	// //cek
-	// $sql 	= "SELECT kode_booking FROM cek_booking WHERE tgl_booking between '$fromdate' AND '$todate' AND id_mobil='$vid' AND status!='Cancel'";
-	// $query 	= mysqli_query($koneksidb,$sql);
-	// if(mysqli_num_rows($query)>0){
-	// 		echo " <script> alert ('Mobil tidak tersedia di tanggal yang anda pilih, silahkan pilih tanggal lain!'); 
-	// 		</script> ";
-	// 	}else{
-	// 		echo "<script type='text/javascript'> document.location = 'booking_ready.php?vid=$vid&mulai=$fromdate&selesai=$todate&driver=$driver&pickup=$pickup'; </script>";
-	// 	}
-	// }
 ?>
 	<!DOCTYPE HTML>
 	<html lang="en">

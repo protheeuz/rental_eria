@@ -52,12 +52,54 @@ if (strlen($_SESSION['alogin']) == 0) {
                 border-radius: 8px;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             }
+
+            .leaflet-popup {
+                bottom: 20px !important;
+                z-index: 1000 !important;
+            }
+
+            .leaflet-popup-content-wrapper {
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+                transition: all 0.3s ease;
+            }
+
+            .leaflet-popup-content {
+                margin: 0 !important;
+                padding: 15px !important;
+            }
+
+            .leaflet-popup-close-button {
+                right: 8px !important;
+                top: 8px !important;
+                font-size: 20px !important;
+                color: #6c757d !important;
+            }
+
+            .vehicle-status {
+                min-width: 250px;
+                padding: 15px;
+            }
+
+            .status-item {
+                display: flex;
+                justify-content: space-between;
+                margin: 8px 0;
+            }
+
+            .status-label {
+                color: #6c757d;
+                font-weight: 500;
+            }
+
+            .status-value {
+                color: #2c3e50;
+                font-weight: 600;
+            }
         </style>
     </head>
-
     <body>
         <?php include('includes/header.php'); ?>
-
         <div class="ts-main-content">
             <?php include('includes/leftbar.php'); ?>
 
@@ -75,7 +117,6 @@ if (strlen($_SESSION['alogin']) == 0) {
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -99,14 +140,49 @@ if (strlen($_SESSION['alogin']) == 0) {
 
             // Inisialisasi peta
             const map = L.map('map').setView([-7.708628, 109.476342], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
+            // Buat marker dengan popup
             let marker = L.marker([-7.708628, 109.476342], {
-                icon: carIcon
+                icon: carIcon,
+                riseOnHover: true
             }).addTo(map);
 
+            // Fungsi untuk membuat konten popup
+            const createPopupContent = (data) => `
+        <div class="vehicle-status">
+            <h5 style="color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                Status Kendaraan
+            </h5>
+            <div class="status-item">
+                <span class="status-label">Kecepatan:</span>
+                <span class="status-value text-success">${data.speed} km/h</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Baterai:</span>
+                <span class="status-value text-primary">${data.battery}%</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Status:</span>
+                <span class="status-value">
+                    ${data.status === '1' ? 
+                        '<span class="text-success">Aktif</span>' : 
+                        '<span class="text-danger">Nonaktif</span>'}
+                </span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Update Terakhir:</span>
+                <span class="status-value">${data.time}</span>
+            </div>
+        </div>
+    `;
+            // Inisialisasi popup pertama kali
+            marker.bindPopup(createPopupContent({
+                speed: '0',
+                battery: '-',
+                status: '1',
+                time: 'Memuat data...'
+            })).openPopup();
             // Fungsi update data
             async function updatePosition() {
                 try {
@@ -117,47 +193,18 @@ if (strlen($_SESSION['alogin']) == 0) {
                         console.error('Error:', data.error);
                         return;
                     }
-
-                    // Update marker
                     marker.setLatLng([data.lat, data.lon]);
-                    marker.setRotationAngle(data.direction);
-
-                    // Update popup
-                    const popupContent = `
-                    <div class="status-box">
-                        <h4 style="color:#2c3e50; margin-bottom:15px">Status Kendaraan</h4>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong>Kecepatan:</strong> <span class="text-success">${data.speed} km/h</span></p>
-                                <p><strong>Baterai:</strong> <span class="text-primary">${data.battery}%</span></p>
-                                <p><strong>Arah:</strong> ${data.direction}°</p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Status:</strong> ${data.status === '1' ? '<span class="text-success">Aktif</span>' : '<span class="text-danger">Nonaktif</span>'}</p>
-                                <p><strong>Sinyal:</strong> ${data.signal}/100</p>
-                                <p><strong>Tegangan:</strong> ${data.voltage}V</p>
-                            </div>
-                        </div>
-                        <hr>
-                        <small class="text-muted">Update terakhir: ${data.time}</small>
-                    </div>
-                `;
-
-                    if (!marker.getPopup()) {
-                        marker.bindPopup(popupContent).openPopup();
-                    } else {
-                        marker.setPopupContent(popupContent);
-                    }
-
+                    marker.setPopupContent(createPopupContent(data));
                     map.panTo([data.lat, data.lon]);
-
                 } catch (error) {
-                    console.error('Gagal update:', error);
+                    console.error('Gagal memperbarui:', error);
                 }
             }
-
-            // Auto-update setiap 5 detik
-            setInterval(updatePosition, 5000);
+            marker.on('click', function(e) {
+                marker.togglePopup();
+            });
+            // Auto-update setiap 3 detik
+            setInterval(updatePosition, 3000);
             updatePosition();
         </script>
     </body>

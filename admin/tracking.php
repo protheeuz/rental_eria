@@ -1,5 +1,4 @@
 <?php
-// tracking.php
 session_start();
 error_reporting(0);
 include('includes/config.php');
@@ -18,7 +17,7 @@ if (strlen($_SESSION['alogin']) == 0) {
         <meta name="author" content="">
         <meta name="theme-color" content="#3e454c">
 
-        <title>Rental Mobil | Tracking Kendaraan</title>
+        <title>Rental Mobil Eria | Tracking Kendaraan</title>
 
         <!-- Font awesome -->
         <link rel="stylesheet" href="css/font-awesome.min.css">
@@ -150,35 +149,47 @@ if (strlen($_SESSION['alogin']) == 0) {
             }).addTo(map);
 
             // Fungsi untuk membuat konten popup
-            const createPopupContent = (data) => `
-        <div class="vehicle-status">
-            <h5 style="color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
-                Status Kendaraan
-            </h5>
-            <div class="status-item">
-                <span class="status-label">Kecepatan:</span>
-                <span class="status-value text-success">${data.speed} km/h</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Baterai:</span>
-                <span class="status-value text-primary">${data.battery}%</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Status:</span>
-                <span class="status-value">
-                    ${data.status === '1' ? 
-                        '<span class="text-success">Aktif</span>' : 
-                        '<span class="text-danger">Nonaktif</span>'}
-                </span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Update Terakhir:</span>
-                <span class="status-value">${data.time}</span>
-            </div>
+            const createPopupContent = (vehicleData, gpsData) => `
+    <div class="vehicle-status">
+        <h5 style="color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+            ${vehicleData.nama_mobil} (${vehicleData.nopol})
+        </h5>
+        <div class="status-item">
+            <span class="status-label">Kecepatan:</span>
+            <span class="status-value text-success">${gpsData.speed} km/h</span>
         </div>
-    `;
-            // Inisialisasi popup pertama kali
+        <div class="status-item">
+            <span class="status-label">Baterai:</span>
+            <span class="status-value text-primary">${gpsData.battery}%</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Status:</span>
+            <span class="status-value">
+                ${gpsData.status === '1' ? 
+                    '<span class="text-success">Aktif</span>' : 
+                    '<span class="text-danger">Nonaktif</span>'}
+            </span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Arah:</span>
+            <span class="status-value">${gpsData.direction}°</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Sinyal:</span>
+            <span class="status-value">${gpsData.signal}/31</span>
+        </div>
 
+        <div class="status-item">
+            <span class="status-label">Tegangan:</span>
+            <span class="status-value">${gpsData.voltage}V</span>
+        </div>
+                <div class="status-item">
+            <span class="status-label">Update Terakhir:</span>
+            <span class="status-value">${gpsData.time}</span>
+        </div>
+    </div>
+`;
+            // Inisialisasi popup pertama kali
             const initialTime = new Date().toLocaleString('id-ID', {
                 weekday: 'long',
                 day: 'numeric',
@@ -188,30 +199,36 @@ if (strlen($_SESSION['alogin']) == 0) {
                 minute: '2-digit',
                 second: '2-digit'
             });
+            // Fungsi update data
+            async function updatePosition() {
+                try {
+                    const response = await fetch('gps-api.php');
+                    const responseData = await response.json();
 
+                    if (responseData.error) {
+                        console.error('Error:', responseData.error);
+                        return;
+                    }
+                    const {
+                        vehicle,
+                        gps_data
+                    } = responseData;
+                    marker.setLatLng([gps_data.lat, gps_data.lon]);
+                    marker.setPopupContent(createPopupContent(vehicle, gps_data));
+                    map.panTo([gps_data.lat, gps_data.lon]);
+                } catch (error) {
+                    console.error('Gagal memperbarui:', error);
+                }
+            }
             marker.bindPopup(createPopupContent({
+                nama_mobil: 'Mobil',
+                nopol: 'B 0000 XX'
+            }, {
                 speed: '0',
                 battery: '-',
                 status: '1',
                 time: initialTime
             })).openPopup();
-            // Fungsi update data
-            async function updatePosition() {
-                try {
-                    const response = await fetch('map-api.php');
-                    const data = await response.json();
-
-                    if (data.error) {
-                        console.error('Error:', data.error);
-                        return;
-                    }
-                    marker.setLatLng([data.lat, data.lon]);
-                    marker.setPopupContent(createPopupContent(data));
-                    map.panTo([data.lat, data.lon]);
-                } catch (error) {
-                    console.error('Gagal memperbarui:', error);
-                }
-            }
             marker.on('click', function(e) {
                 marker.togglePopup();
             });

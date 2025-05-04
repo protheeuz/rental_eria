@@ -98,6 +98,7 @@ if (strlen($_SESSION['alogin']) == 0) {
             }
         </style>
     </head>
+
     <body>
         <?php include('includes/header.php'); ?>
         <div class="ts-main-content">
@@ -177,11 +178,22 @@ if (strlen($_SESSION['alogin']) == 0) {
         </div>
     `;
             // Inisialisasi popup pertama kali
+
+            const initialTime = new Date().toLocaleString('id-ID', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
             marker.bindPopup(createPopupContent({
                 speed: '0',
                 battery: '-',
                 status: '1',
-                time: 'Memuat data...'
+                time: initialTime
             })).openPopup();
             // Fungsi update data
             async function updatePosition() {

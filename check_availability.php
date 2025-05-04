@@ -19,5 +19,4 @@ if(!empty($_POST["emailid"])) {
 	}
 	}
 }
-
 ?>

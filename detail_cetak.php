@@ -10,8 +10,21 @@ $result = mysqli_fetch_array($query1);
 $harga    = $result['harga'];
 $durasi = $result['durasi'];
 $totalmobil = $durasi * $harga;
-$drivercharges = $result['driver'];
+// $drivercharges = $result['driver'];
+// $totalsewa = $totalmobil + $drivercharges;
+$sqldriver = "SELECT * FROM tblpages WHERE id='0'";
+$querydriver = mysqli_query($koneksidb, $sqldriver);
+$resultdriver = mysqli_fetch_array($querydriver);
+$driver_cost_per_day = (int)str_replace('.', '', $resultdriver['detail']);
+
+// Hitung biaya
+$harga = (int)str_replace('.', '', $result['harga']);
+$durasi = $result['durasi'];
+$totalmobil = $harga * $durasi;
+$drivercharges = $result['driver'] * $driver_cost_per_day * $durasi;
 $totalsewa = $totalmobil + $drivercharges;
+
+// Format tanggal
 $tglmulai = strtotime($result['tgl_mulai']);
 $jmlhari  = 86400 * 1;
 $tgl      = $tglmulai - $jmlhari;
@@ -246,8 +259,8 @@ $tglhasil = date("Y-m-d", $tgl);
 
 		<div class="footer">
 			<p>Terima kasih telah menggunakan layanan kami<br>
-				Untuk pertanyaan silahkan hubungi kami di (021) 12345678 atau email info@rentalmobil.com</p>
-			<p><strong>www.rentalmobil.com</strong></p>
+				Untuk pertanyaan silahkan hubungi kami di (021) 12345678 atau email info@eriarentalcar.com</p>
+			<p><strong>www.eriarentalcar.com</strong></p>
 		</div>
 	</div>
 

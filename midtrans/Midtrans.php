@@ -6,6 +6,7 @@ require_once __DIR__.'/midtrans-php/ApiRequestor.php';
 require_once __DIR__.'/midtrans-php/Sanitizer.php';
 require_once __DIR__.'/midtrans-php/Snap.php';
 require_once __DIR__.'/midtrans-php/Notification.php';
+require_once __DIR__.'/midtrans-php/Transaction.php';
 
 class Midtrans {
     public static function config($params) {

@@ -2,6 +2,37 @@
 # Pengaturan tanggal komputer
 date_default_timezone_set("Asia/Jakarta");
 
+// function buatKode($tabel, $prefix)
+// {
+// 	global $koneksidb;
+
+// 	$max_attempt = 10;
+// 	$attempt = 0;
+
+// 	do {
+// 		$query = "SELECT MAX(kode_booking) AS max_code FROM $tabel";
+// 		$result = mysqli_query($koneksidb, $query);
+// 		$data = mysqli_fetch_assoc($result);
+
+// 		$number = ($data['max_code']) ?
+// 			(int) substr($data['max_code'], strlen($prefix)) + 1 : 1;
+
+// 		$new_code = $prefix . str_pad($number, 6, '0', STR_PAD_LEFT);
+
+// 		$check = mysqli_query(
+// 			$koneksidb,
+// 			"SELECT kode_booking FROM $tabel WHERE kode_booking='$new_code'"
+// 		);
+// 		$attempt++;
+// 	} while (mysqli_num_rows($check) > 0 && $attempt < $max_attempt);
+
+// 	if ($attempt >= $max_attempt) {
+// 		throw new Exception("Gagal generate kode unik setelah $max_attempt percobaan");
+// 	}
+
+// 	return $new_code;
+// }
+
 function buatKode($tabel, $prefix)
 {
 	global $koneksidb;
@@ -10,15 +41,10 @@ function buatKode($tabel, $prefix)
 	$attempt = 0;
 
 	do {
-		$query = "SELECT MAX(kode_booking) AS max_code FROM $tabel";
-		$result = mysqli_query($koneksidb, $query);
-		$data = mysqli_fetch_assoc($result);
-
-		$number = ($data['max_code']) ?
-			(int) substr($data['max_code'], strlen($prefix)) + 1 : 1;
-
-		$new_code = $prefix . str_pad($number, 6, '0', STR_PAD_LEFT);
-
+		$timestamp = date('YmdHis');
+		$random = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+		$new_code = "{$prefix}{$timestamp}{$random}"; // Contoh: TRX20240504153000123
+		// Cek apakah kode sudah pernah digunakan di Midtrans
 		$check = mysqli_query(
 			$koneksidb,
 			"SELECT kode_booking FROM $tabel WHERE kode_booking='$new_code'"

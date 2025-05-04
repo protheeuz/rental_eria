@@ -1,4 +1,5 @@
 <?php
+
 namespace Midtrans;
 
 use Exception;
@@ -24,20 +25,22 @@ class ApiRequestor
 
         $response = curl_exec($ch);
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        
-        if(curl_errno($ch)) {
+
+        if (curl_errno($ch)) {
             throw new Exception(curl_error($ch));
         }
 
         curl_close($ch);
-        
+
         $result = json_decode($response, true);
-        
-        if($httpcode != 201) {
-            throw new Exception($result['error_messages'][0] ?? 'Midtrans API Error');
+
+        if ($httpcode >= 400) {
+            $errorMessage = $result['error_messages'][0] ??
+                $result['message'] ??
+                'Unknown Midtrans API Error';
+            throw new Exception("HTTP $httpcode - $errorMessage");
         }
-        
+
         return $result;
     }
 }
-?>

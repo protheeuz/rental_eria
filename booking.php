@@ -21,9 +21,9 @@ if (strlen($_SESSION['ulogin']) == 0) {
 		$pickup = $_POST['pickup'];
 
 		$sql = "SELECT kode_booking FROM cek_booking 
-			   WHERE tgl_booking BETWEEN '$fromdate' AND '$todate' 
-			   AND id_mobil = '$vid' 
-			   AND status != 'Cancel'";
+        WHERE tgl_booking BETWEEN '$fromdate' AND '$todate' 
+        AND id_mobil = '$vid' 
+        AND (status = 'Sudah Dibayar' OR status = 'success')";
 
 		$query = mysqli_query($koneksidb, $sql);
 

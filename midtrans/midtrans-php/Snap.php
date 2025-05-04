@@ -1,4 +1,5 @@
 <?php
+
 namespace Midtrans;
 
 use Exception;
@@ -8,34 +9,45 @@ class Snap
     public static function getSnapToken($params)
     {
         try {
-            $params = Sanitizer::sanitize($params);
-            
-            $payloads = [
+            if (
+                empty($params['transaction_details']['order_id']) ||
+                empty($params['transaction_details']['gross_amount'])
+            ) {
+                throw new Exception("Invalid transaction details");
+            }
+
+            $payload = [
                 'transaction_details' => [
                     'order_id' => $params['transaction_details']['order_id'],
-                    'gross_amount' => $params['transaction_details']['gross_amount']
+                    'gross_amount' => (int)$params['transaction_details']['gross_amount']
+                ],
+                'credit_card' => [
+                    'secure' => true
                 ]
             ];
 
-            if(isset($params['item_details'])) {
-                $payloads['item_details'] = $params['item_details'];
-            }
+            $optionalFields = [
+                'item_details',
+                'customer_details',
+                'callbacks',
+                'enabled_payments'
+            ];
 
-            if(isset($params['customer_details'])) {
-                $payloads['customer_details'] = $params['customer_details'];
+            foreach ($optionalFields as $field) {
+                if (isset($params[$field])) {
+                    $payload[$field] = $params[$field];
+                }
             }
 
             $result = ApiRequestor::post(
                 Config::getSnapBaseUrl() . '/transactions',
                 Config::$serverKey,
-                $payloads
+                $payload
             );
 
             return $result['token'];
-            
         } catch (Exception $e) {
             throw new Exception('Snap API Error: ' . $e->getMessage());
         }
     }
 }
-?>

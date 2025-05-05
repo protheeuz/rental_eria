@@ -8,10 +8,43 @@ if (strlen($_SESSION['alogin']) == 0) {
     exit;
 }
 
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $imei = trim($_POST['imei']);
+// Handle delete action
+if (isset($_POST['delete'])) {
     $id_mobil = intval($_POST['id_mobil']);
+
+    try {
+        $stmt = $koneksidb->prepare("DELETE FROM gps_devices WHERE id_mobil = ?");
+        $stmt->bind_param('i', $id_mobil);
+        if ($stmt->execute()) {
+            header('Location: tambah-data-gps.php?success=2');
+        } else {
+            header('Location: tambah-data-gps.php?error=4');
+        }
+        exit;
+    } catch (Exception $e) {
+        header('Location: tambah-data-gps.php?error=5');
+        exit;
+    }
+}
+
+// Handle edit action - get existing data
+$edit_data = null;
+if (isset($_GET['edit'])) {
+    $id_mobil = intval($_GET['edit']);
+
+    $stmt = $koneksidb->prepare("SELECT g.imei, m.id_mobil, m.nama_mobil, m.nopol 
+                                FROM gps_devices g
+                                JOIN mobil m ON g.id_mobil = m.id_mobil
+                                WHERE g.id_mobil = ?");
+    $stmt->bind_param('i', $id_mobil);
+    $stmt->execute();
+    $edit_data = $stmt->get_result()->fetch_assoc();
+}
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete'])) {
+    $imei = trim($_POST['imei']);
+    $id_mobil = isset($_POST['id_mobil']) ? intval($_POST['id_mobil']) : 0;
 
     if (empty($imei) || $id_mobil <= 0) {
         header('Location: tambah-data-gps.php?error=1');
@@ -53,6 +86,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Ambil data mobil
 $mobil_sql = "SELECT id_mobil, nama_mobil, nopol FROM mobil";
 $mobil_result = $koneksidb->query($mobil_sql);
+
+// Query untuk tabel list GPS
+$gps_list_sql = "SELECT g.imei, m.id_mobil, m.nama_mobil, m.nopol 
+                FROM gps_devices g
+                JOIN mobil m ON g.id_mobil = m.id_mobil
+                ORDER BY m.nama_mobil";
+$gps_list_result = $koneksidb->query($gps_list_sql);
 
 $koneksidb->query("CREATE TABLE IF NOT EXISTS gps_devices (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -102,7 +142,8 @@ $koneksidb->query("CREATE TABLE IF NOT EXISTS gps_devices (
                                 <?php if (isset($_GET['success'])): ?>
                                     <div class="alert alert-success alert-dismissible">
                                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                        <i class="icon fa fa-check"></i> Data berhasil disimpan!
+                                        <i class="icon fa fa-check"></i>
+                                        <?= $_GET['success'] == 1 ? 'Data berhasil disimpan!' : 'Data berhasil dihapus!' ?>
                                     </div>
                                 <?php endif; ?>
 
@@ -121,6 +162,12 @@ $koneksidb->query("CREATE TABLE IF NOT EXISTS gps_devices (
                                             case 3:
                                                 echo 'Terjadi kesalahan sistem';
                                                 break;
+                                            case 4:
+                                                echo 'Gagal menghapus data';
+                                                break;
+                                            case 5:
+                                                echo 'Terjadi kesalahan saat menghapus';
+                                                break;
                                             default:
                                                 echo 'Terjadi kesalahan';
                                         }
@@ -129,17 +176,30 @@ $koneksidb->query("CREATE TABLE IF NOT EXISTS gps_devices (
                                 <?php endif; ?>
 
                                 <form method="POST" class="form-horizontal">
+                                    <?php if ($edit_data): ?>
+                                        <input type="hidden" name="id_mobil" value="<?= $edit_data['id_mobil'] ?>">
+                                    <?php endif; ?>
+
                                     <div class="form-group">
                                         <label class="col-sm-2 control-label">Pilih Mobil</label>
                                         <div class="col-sm-10">
-                                            <select class="form-control" name="id_mobil" required>
-                                                <option value="">-- Pilih Mobil --</option>
-                                                <?php while ($mobil = $mobil_result->fetch_assoc()): ?>
-                                                    <option value="<?= $mobil['id_mobil'] ?>">
-                                                        <?= htmlspecialchars($mobil['nama_mobil']) ?>
-                                                        (<?= htmlspecialchars($mobil['nopol']) ?>)
+                                            <select class="form-control" name="id_mobil" <?= $edit_data ? 'disabled' : 'required' ?>>
+                                                <?php if ($edit_data): ?>
+                                                    <option value="<?= $edit_data['id_mobil'] ?>" selected>
+                                                        <?= htmlspecialchars($edit_data['nama_mobil']) ?>
+                                                        (<?= htmlspecialchars($edit_data['nopol']) ?>)
                                                     </option>
-                                                <?php endwhile; ?>
+                                                <?php else: ?>
+                                                    <option value="">-- Pilih Mobil --</option>
+                                                    <?php
+                                                    $mobil_result->data_seek(0);
+                                                    while ($mobil = $mobil_result->fetch_assoc()): ?>
+                                                        <option value="<?= $mobil['id_mobil'] ?>" <?= isset($_POST['id_mobil']) && $_POST['id_mobil'] == $mobil['id_mobil'] ? 'selected' : '' ?>>
+                                                            <?= htmlspecialchars($mobil['nama_mobil']) ?>
+                                                            (<?= htmlspecialchars($mobil['nopol']) ?>)
+                                                        </option>
+                                                    <?php endwhile; ?>
+                                                <?php endif; ?>
                                             </select>
                                         </div>
                                     </div>
@@ -150,6 +210,7 @@ $koneksidb->query("CREATE TABLE IF NOT EXISTS gps_devices (
                                             <input type="text"
                                                 class="form-control"
                                                 name="imei"
+                                                value="<?= $edit_data ? htmlspecialchars($edit_data['imei']) : '' ?>"
                                                 placeholder="Masukkan 15 digit IMEI GPS"
                                                 required
                                                 pattern="[0-9]{15}"
@@ -160,11 +221,68 @@ $koneksidb->query("CREATE TABLE IF NOT EXISTS gps_devices (
                                     <div class="form-group">
                                         <div class="col-sm-offset-2 col-sm-10">
                                             <button type="submit" class="btn btn-primary">
-                                                <i class="fa fa-save"></i> Simpan Data
+                                                <i class="fa fa-<?= $edit_data ? 'refresh' : 'save' ?>"></i>
+                                                <?= $edit_data ? 'Update Data' : 'Simpan Data' ?>
                                             </button>
+
+                                            <?php if ($edit_data): ?>
+                                                <a href="tambah-data-gps.php" class="btn btn-default">
+                                                    <i class="fa fa-times"></i> Batal Edit
+                                                </a>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+
+                        <!-- Tabel List GPS -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Daftar GPS Terdaftar</div>
+                            <div class="panel-body">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Nama Mobil</th>
+                                            <th>Nomor Polisi</th>
+                                            <th>IMEI GPS</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if ($gps_list_result->num_rows > 0): ?>
+                                            <?php $no = 1; ?>
+                                            <?php while ($row = $gps_list_result->fetch_assoc()): ?>
+                                                <tr>
+                                                    <td><?= $no++ ?></td>
+                                                    <td><?= htmlspecialchars($row['nama_mobil']) ?></td>
+                                                    <td><?= htmlspecialchars($row['nopol']) ?></td>
+                                                    <td><?= htmlspecialchars($row['imei']) ?></td>
+                                                    <td>
+                                                        <a href="tambah-data-gps.php?edit=<?= $row['id_mobil'] ?>"
+                                                            class="btn btn-sm btn-warning">
+                                                            <i class="fa fa-edit"></i> Edit
+                                                        </a>
+
+                                                        <form method="POST" style="display:inline-block">
+                                                            <input type="hidden" name="id_mobil" value="<?= $row['id_mobil'] ?>">
+                                                            <button type="submit" name="delete"
+                                                                class="btn btn-sm btn-danger"
+                                                                onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                                                <i class="fa fa-trash"></i> Hapus
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            <?php endwhile; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="5" class="text-center">Tidak ada data GPS terdaftar</td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

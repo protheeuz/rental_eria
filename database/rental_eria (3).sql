@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 04, 2025 at 04:36 AM
+-- Generation Time: May 04, 2025 at 11:35 PM
 -- Server version: 8.0.30
 -- PHP Version: 7.4.32
 
@@ -68,9 +68,9 @@ CREATE TABLE `booking` (
 --
 
 INSERT INTO `booking` (`kode_booking`, `id_mobil`, `tgl_mulai`, `tgl_selesai`, `durasi`, `driver`, `status`, `email`, `pickup`, `tgl_booking`, `total_harga`, `snap_token`, `midtrans_data`) VALUES
-('TRX202505041101520985', 10, '2025-05-05', '2025-05-06', 2, 0, 'pending', 'yusuf@gmail.com', 'Ambil Sendiri', '2025-05-04', 2000, '18163ff2-e88e-4793-b74f-acd55ee69e56', '{\"transaction_details\":{\"order_id\":\"TRX202505041101520985\",\"gross_amount\":2000,\"currency\":\"IDR\"},\"item_details\":[{\"id\":\"MOBIL-10\",\"price\":2000,\"quantity\":1,\"name\":\"Sewa Mobil (2 Hari)\",\"category\":\"Car Rental\"}],\"customer_details\":{\"first_name\":\"Yusuf\",\"email\":\"yusuf@gmail.com\",\"phone\":\"08122233343\",\"billing_address\":{\"address\":\"Alamat Pengguna\",\"city\":\"Kota Pengguna\"}},\"callbacks\":{\"finish\":\"http:\\/\\/localhost\\/payment_success.php?kode=TRX202505041101520985\"}}'),
-('TRX202505041105326003', 10, '2025-05-05', '2025-05-06', 2, 0, 'pending', 'yusuf@gmail.com', 'Ambil Sendiri', '2025-05-04', 2000, '6a031be9-dbec-4c60-97a5-d20defe1f1a3', '{\"transaction_details\":{\"order_id\":\"TRX202505041105326003\",\"gross_amount\":2000,\"currency\":\"IDR\"},\"item_details\":[{\"id\":\"MOBIL-10\",\"price\":2000,\"quantity\":1,\"name\":\"Sewa Mobil (2 Hari)\",\"category\":\"Car Rental\"}],\"customer_details\":{\"first_name\":\"Yusuf\",\"email\":\"yusuf@gmail.com\",\"phone\":\"08122233343\",\"billing_address\":{\"address\":\"Alamat Pengguna\",\"city\":\"Kota Pengguna\"}},\"callbacks\":{\"finish\":\"http:\\/\\/localhost\\/payment_success.php?kode=TRX202505041105326003\"}}'),
-('TRX202505041131307516', 10, '2025-05-05', '2025-05-06', 2, 0, 'pending', 'yusuf@gmail.com', 'Ambil Sendiri', '2025-05-04', 2000, '8b02c561-45bb-4896-b777-0a59b49c6940', '{\"transaction_details\":{\"order_id\":\"TRX202505041131307516\",\"gross_amount\":2000,\"currency\":\"IDR\"},\"item_details\":[{\"id\":\"MOBIL-10\",\"price\":2000,\"quantity\":1,\"name\":\"Sewa Mobil (2 Hari)\",\"category\":\"Car Rental\"}],\"customer_details\":{\"first_name\":\"Yusuf\",\"email\":\"yusuf@gmail.com\",\"phone\":\"08122233343\",\"billing_address\":{\"address\":\"Alamat Pengguna\",\"city\":\"Kota Pengguna\"}},\"callbacks\":{\"finish\":\"http:\\/\\/localhost\\/booking_detail.php?kode=TRX202505041131307516\"},\"enable_callback\":true,\"callback_url\":\"http:\\/\\/localhost\\/midtrans_notification.php\"}');
+('TRX202505041222126922', 10, '2025-05-05', '2025-05-06', 2, 1, 'Sudah Dibayar', 'yusuf@gmail.com', 'Ambil Sendiri', '2025-05-04', 902000, '7f26255f-68c2-4ea9-9a2c-3064ee06743b', '{\"transaction_details\":{\"order_id\":\"TRX202505041222126922\",\"gross_amount\":902000,\"currency\":\"IDR\"},\"item_details\":[{\"id\":\"MOBIL-10\",\"price\":902000,\"quantity\":1,\"name\":\"Sewa Mobil (2 Hari)\",\"category\":\"Car Rental\"}],\"customer_details\":{\"first_name\":\"Yusuf\",\"email\":\"yusuf@gmail.com\",\"phone\":\"08122233343\",\"billing_address\":{\"address\":\"Alamat Pengguna\",\"city\":\"Kota Pengguna\"}},\"callbacks\":{\"finish\":\"http:\\/\\/localhost\\/booking_detail.php?kode=TRX202505041222126922\"},\"enable_callback\":true,\"callback_url\":\"http:\\/\\/localhost\\/midtrans_notification.php\"}'),
+('TRX202505041232592174', 11, '2025-05-05', '2025-05-06', 2, 0, 'Sudah Dibayar', 'yusuf@gmail.com', 'Ambil Sendiri', '2025-05-04', 2000, 'c786525e-1448-473d-852a-e1df9bde786b', '{\"transaction_details\":{\"order_id\":\"TRX202505041232592174\",\"gross_amount\":2000,\"currency\":\"IDR\"},\"item_details\":[{\"id\":\"MOBIL-11\",\"price\":2000,\"quantity\":1,\"name\":\"Sewa Mobil (2 Hari)\",\"category\":\"Car Rental\"}],\"customer_details\":{\"first_name\":\"Yusuf\",\"email\":\"yusuf@gmail.com\",\"phone\":\"08122233343\",\"billing_address\":{\"address\":\"Alamat Pengguna\",\"city\":\"Kota Pengguna\"}},\"callbacks\":{\"finish\":\"http:\\/\\/localhost\\/booking_detail.php?kode=TRX202505041232592174\"},\"enable_callback\":true,\"callback_url\":\"http:\\/\\/localhost\\/midtrans_notification.php\"}'),
+('TRX202505041838364204', 10, '2025-05-05', '2025-05-06', 2, 0, 'pending', 'yusuf@gmail.com', 'Ambil Sendiri', '2025-05-04', 2000, '93a56341-c90b-45fb-9501-707d9a165ec9', '{\"transaction_details\":{\"order_id\":\"TRX202505041838364204\",\"gross_amount\":2000,\"currency\":\"IDR\"},\"item_details\":[{\"id\":\"MOBIL-10\",\"price\":2000,\"quantity\":1,\"name\":\"Sewa Mobil (2 Hari)\",\"category\":\"Car Rental\"}],\"customer_details\":{\"first_name\":\"Yusuf\",\"email\":\"yusuf@gmail.com\",\"phone\":\"08122233343\",\"billing_address\":{\"address\":\"Alamat Pengguna\",\"city\":\"Kota Pengguna\"}},\"callbacks\":{\"finish\":\"http:\\/\\/localhost\\/booking_detail.php?kode=TRX202505041838364204\"},\"enable_callback\":true,\"callback_url\":\"http:\\/\\/localhost\\/midtrans_notification.php\"}');
 
 -- --------------------------------------------------------
 
@@ -79,7 +79,7 @@ INSERT INTO `booking` (`kode_booking`, `id_mobil`, `tgl_mulai`, `tgl_selesai`, `
 --
 
 CREATE TABLE `cek_booking` (
-  `kode_booking` varchar(20) NOT NULL,
+  `kode_booking` varchar(50) NOT NULL,
   `id_mobil` int NOT NULL,
   `tgl_booking` varchar(10) NOT NULL,
   `status` varchar(20) NOT NULL
@@ -94,7 +94,9 @@ INSERT INTO `cek_booking` (`kode_booking`, `id_mobil`, `tgl_booking`, `status`) 
 ('TRX00002', 9, '2019-05-26', 'Menunggu Pembayaran'),
 ('TRX00002', 9, '2019-05-27', 'Menunggu Pembayaran'),
 ('TRX00000', 11, '2022-09-08', 'Menunggu Pembayaran'),
-('TRX00000', 11, '2022-09-09', 'Menunggu Pembayaran');
+('TRX00000', 11, '2022-09-09', 'Menunggu Pembayaran'),
+('TRX202505041232592174', 11, '2025-05-05', 'Sudah Dibayar'),
+('TRX202505041232592174', 11, '2025-05-06', 'Sudah Dibayar');
 
 -- --------------------------------------------------------
 
@@ -139,6 +141,26 @@ CREATE TABLE `contactusinfo` (
 
 INSERT INTO `contactusinfo` (`id_info`, `alamat_kami`, `email_kami`, `telp_kami`) VALUES
 (1, 'Rental Mobil \r\nJl. Kemanggisan Raya No.19, RT.4/RW.13, Kemanggisan, Kec. Palmerah, Kota Jakarta Barat, Daerah Khusus Ibukota Jakarta 11480\r\n', 'rentalmobil@gmail.com', '08585233222');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `gps_devices`
+--
+
+CREATE TABLE `gps_devices` (
+  `id` int NOT NULL,
+  `imei` varchar(20) NOT NULL,
+  `id_mobil` int NOT NULL,
+  `created_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `gps_devices`
+--
+
+INSERT INTO `gps_devices` (`id`, `imei`, `id_mobil`, `created_at`) VALUES
+(1, '869207032962699', 10, '2025-05-05 05:52:22');
 
 -- --------------------------------------------------------
 
@@ -291,6 +313,14 @@ ALTER TABLE `contactusinfo`
   ADD PRIMARY KEY (`id_info`);
 
 --
+-- Indexes for table `gps_devices`
+--
+ALTER TABLE `gps_devices`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `imei` (`imei`),
+  ADD UNIQUE KEY `id_mobil` (`id_mobil`);
+
+--
 -- Indexes for table `merek`
 --
 ALTER TABLE `merek`
@@ -337,6 +367,12 @@ ALTER TABLE `contactusinfo`
   MODIFY `id_info` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `gps_devices`
+--
+ALTER TABLE `gps_devices`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `merek`
 --
 ALTER TABLE `merek`
@@ -359,6 +395,16 @@ ALTER TABLE `tblpages`
 --
 ALTER TABLE `users`
   MODIFY `id_user` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `gps_devices`
+--
+ALTER TABLE `gps_devices`
+  ADD CONSTRAINT `gps_devices_ibfk_1` FOREIGN KEY (`id_mobil`) REFERENCES `mobil` (`id_mobil`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

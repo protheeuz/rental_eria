@@ -41,23 +41,6 @@ try {
         </script>");
 }
 
-// Simpan ke database
-// $sql = "INSERT INTO booking 
-//         (kode_booking, id_mobil, tgl_mulai, tgl_selesai, durasi, 
-//         driver, status, email, pickup, tgl_booking, total_harga)
-//         VALUES(
-//             '$kode',
-//             " . (int)$_SESSION['booking_data']['vid'] . ",
-//             '" . $_SESSION['booking_data']['fromdate'] . "',
-//             '" . $_SESSION['booking_data']['todate'] . "',
-//             " . (int)$_SESSION['booking_data']['durasi'] . ",
-//             " . (int)$_SESSION['booking_data']['driver'] . ", 
-//             'pending',
-//             '" . mysqli_real_escape_string($koneksidb, $_SESSION['booking_data']['email']) . "',
-//             '" . mysqli_real_escape_string($koneksidb, $_SESSION['booking_data']['pickup']) . "',
-//             NOW(),
-//             " . (int)$_SESSION['booking_data']['total'] . "
-//         )";
 $sql = "INSERT INTO booking 
         (kode_booking, id_mobil, tgl_mulai, tgl_selesai, durasi, 
         driver, status, email, pickup, tgl_booking, total_harga, snap_token, midtrans_data)
@@ -101,14 +84,6 @@ $insert_cek = "INSERT INTO cek_booking
     '" . $_SESSION['booking_data']['fromdate'] . "', 
     '" . $_SESSION['booking_data']['todate'] . "', 
     'Menunggu Pembayaran')";
-
-if (!mysqli_query($koneksidb, $insert_cek)) {
-    error_log("Gagal insert cek_booking: " . mysqli_error($koneksidb));
-    die("<script>
-        alert('Gagal memproses ketersediaan mobil!');
-        window.location = 'booking.php';
-        </script>");
-}
 
 // Setup Midtrans
 try {
